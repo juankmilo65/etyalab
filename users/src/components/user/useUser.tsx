@@ -1,10 +1,12 @@
-import React, { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { getUsers } from './reducer/action'
 import { useDispatch, useSelector } from "react-redux";
-import { IUserList } from '../../interfaces/IUserList';
+import { IUserList, ITable } from '../../interfaces/index';
+import { Table } from '../core'
 
 export default function useUser() {
     const users = useSelector((state: IUserList) => state.users.list);
+    const [tableContent, setTableContent] = useState<ITable>()
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -13,15 +15,18 @@ export default function useUser() {
         }
     })
 
+    useEffect(() => {
+        if (users.length > 0) {
+            setTableContent({
+                headers: Object.keys(users[0]),
+                content: users
+            })
+        }
+    }, [users])
+
     return (
         <div>
-            {
-                users &&
-                users.map(user =>
-                    <div key={user.id}>
-                        <h1>{user.name}</h1>
-                    </div>)
-            }
+            <Table information={tableContent}></Table>
         </div>
     )
 }
